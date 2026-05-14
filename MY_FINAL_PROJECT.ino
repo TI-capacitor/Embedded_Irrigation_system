@@ -12,8 +12,8 @@ const int valveSignal = 8;
 const int button = 2;
 const int moistureSensor = A0;
 
-bool stringComplete = false;
-bool buttonStatus = false;
+volatile bool buttonStatus = false;
+bool manualActive = false; //manual mode menu flag
 
 int buttonCounter = 1;
 
@@ -26,6 +26,45 @@ Sensors sensor;
 
 
 
+void buttonInterrupt()
+{
+  buttonStatus = true;
+}
+
+void lcdDisplay(State,int moisture)
+{
+lcd.setCursor(0,0);
+    lcd.print("MODE:");
+    lcd.print("              ");
+  	lcd.setCursor(5,0);
+	if(currentState == AUTO)
+    {
+      lcd.print("AUTO");
+      lcd.setCursor(0,1);
+      lcd.print("          ");
+      lcd.setCursor(0,1);
+      lcd.print("H:");
+      lcd.print(moisture);
+      Serial.println(moisture);
+    }
+  
+     else if(currentState == MANUAL)
+     {
+      	lcd.setCursor(0,1);
+   	  	lcd.print("            ");
+      	lcd.setCursor(5,0);
+        lcd.print("MANUAL");
+     }
+     else if (currentState == MAINTENANCE)
+    {
+      lcd.print("Maintenance");
+
+      lcd.setCursor(0, 1);
+      lcd.print("Valve OFF     ");
+
+      Serial.println("MAINTENANCE");
+    }
+}
 
 
 void setup() 
@@ -35,6 +74,8 @@ void setup()
   pinMode(button,INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(button), buttonInterrupt, FALLING);
   pinMode(moistureSensor,INPUT);
+  lcd.clear();
+  delay(200);
   lcd.backlight();
   lcd.begin(16,2);
   lcd.print("AUTO IRRIGATION");
@@ -48,81 +89,41 @@ void loop()
  {
   currentTime = millis();
   int moisture = sensor.moistureValue(moistureSensor);
-
-
-  cmd.setWithSerial();
-  lcdDisplay(currentState, moisture);
-
+  cmd.setWithSerial(inputString,currentState,manualActive);
 
   if(buttonStatus)
   {
-    buttonCounter++;
-    if(buttonCounter == 1)
-      mode.setAuto();
-    if(buttonCounter == 2)
-      mode.setManual();
-    if(buttonCounter == 3)
-    {
-      mode.setMaintenance();
-  
-    
-    //do something here
-    switch(currentState)
-    {
-      case AUTO:
-        valve.valveAuto(moisture, 130, valveSignal);
-        break;
-      case MANUAL:
-        mode.setManual();
-        break;
-      case MAINTENANCE:
-        mode.setMaintenance();
-        break;
-    }
-    
+    mode.toggleMode(currentState);
     buttonStatus = false;
   }
 
+  lcdDisplay(currentState, moisture);
   
-
-}
-
-void buttonInterrupt()
-{
-  if(button == LOW)
-    buttonStatus = true;
-  
-}
-
-void lcdDisplay(State,int moisture)
-{
-lcd.setCursor(0,0);
-    lcd.print("MODE:");
-    lcd.print("              ");
-  	lcd.setCursor(5,0);
-	if(currentState == AUTO)
+  //if(prevTime - currentTime)
+    if(currentState == AUTO)
     {
-      lcd.print("AUTO");
-      lcd.setCursor(0,1);
-      lcd.print("     ");
-      lcd.setCursor(0,1);
-      lcd.print("H:");
-      lcd.print(moisture);
-      Serial.println(moisture);
+      valve.valveAuto(moisture, 900, valveSignal);
+      
     }
+    if(buttonCounter == MANUAL)
+    {
+      //probably not needed
+    }
+    if(currentState == AUTO)
+    {
+      valve.valveClose(valveSignal);
+    }
+
+ }
+    
+
+
+
+
   
-     else if(currentState == MANUAL)
-     {
-      	lcd.setCursor(0,1);
-   	  	lcd.print("            ");
-      	lcd.setCursor(5,0);
-        lcd.print("MANUAL");
-        Serial.println("MANUAL");
-     }
-     else if(currentState == MAINTENANCE)
-     {
-        lcd.print("MAINTENANCE");
-        Serial.println("MAINTENANCE");
-     }
-}
+
+
+
+
+
 

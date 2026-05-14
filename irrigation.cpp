@@ -13,9 +13,10 @@ void Valve::valveClose(int v)
 
 void Valve::valveAuto(int reading,int Threshold,int v)
 {
-  if(reading < Threshold)
+  if(reading > Threshold)
   {
   	valveOpen(v);
+    delay(3000);
   }
   else
   {
@@ -25,104 +26,131 @@ void Valve::valveAuto(int reading,int Threshold,int v)
 }
 
 //--------------MODE ACCESS MEMBERS ----------------/
-void Mode::setAuto()
+void Mode::setAuto(State &currentState)
 {
+
 	currentState = AUTO;
   
 }
 
-void Mode::setManual()
+void Mode::setManual(State &currentState)
 {
 	currentState = MANUAL;
 }
 
-void Mode::setMaintenance()
+void Mode::setMaintenance(State &currentState)
 {
 	currentState = MAINTENANCE;
 }
 
 
-void Mode::toggleMode(enum currentState){
+void Mode::toggleMode(State &currentState){
   switch(currentState)
     {
       case AUTO:
-        setManual();
+        setManual(currentState);
         break;
       case MANUAL:
-        setMaintenance();
+        setMaintenance(currentState);
         break;
       case MAINTENANCE:
-        setAuto();
-        
+        setAuto(currentState);
         break;
     }
 }
 
 //--------------COMMAND ACCESS MEMBERS ----------------/
 
-void Command::setWithSerial()
+void Command::setWithSerial(String &inputString, State &currentState, bool &manualMenuActive)
 {
+  bool stringComplete = false;
+
   while (Serial.available() > 0)
   {
     char c = Serial.read();
 
-    if (c == '\n')
+    if (c == '\n' || c == '\r')
     {
       stringComplete = true;
     }
-    else if (c != '\r')
+    else
     {
       inputString += c;
     }
   }
 
-  if (stringComplete)
-  {
-    inputString.trim();
-    inputString.toLowerCase();
+  inputString.trim();
+  inputString.toLowerCase();
 
-    Serial.print("Received: ");
+  if (inputString == "auto")
+  {
+    currentState = AUTO;
+    manualMenuActive = false;
+
+    Serial.println("Mode set to AUTO");
+    inputString = "";
+  }
+  else if (inputString == "manual")
+  {
+    currentState = MANUAL;
+    manualMenuActive = true;
+
+    Serial.println("Mode set to MANUAL");
+    Serial.println("Choose by typing:");
+    Serial.println("beans");
+    Serial.println("peppers");
+    Serial.println("tomatoes");
+
+    inputString = "";
+  }
+  else if (inputString == "maintenance")
+  {
+    currentState = MAINTENANCE;
+    manualMenuActive = false;
+
+    Serial.println("Mode set to MAINTENANCE");
+    inputString = "";
+  }
+  else if (manualMenuActive == true && currentState == MANUAL && inputString == "beans")
+  {
+    Serial.println("Beans selected.");
+    Serial.println("Starting manual watering for BEANS.");
+
+    inputString = "";
+  }
+  else if (manualMenuActive == true && currentState == MANUAL && inputString == "peppers")
+  {
+    Serial.println("Peppers selected.");
+    Serial.println("Starting manual watering for PEPPERS.");
+
+    inputString = "";
+  }
+  else if (manualMenuActive == true && currentState == MANUAL && inputString == "tomatoes")
+  {
+    Serial.println("Tomatoes selected.");
+    Serial.println("Starting manual watering for TOMATOES.");
+
+    inputString = "";
+  }
+  else if (stringComplete && inputString.length() > 0)
+  {
+    Serial.print("Unknown command: ");
     Serial.println(inputString);
 
-    if (inputString == "auto")
+    if (currentState == MANUAL && manualMenuActive == true)
     {
-      currentState = AUTO;
-      Serial.println("Mode set to AUTO");
-    }
-    else if (inputString == "manual")
-    {
-      currentState = MANUAL;
-      Serial.println("Mode set to MANUAL");
-      Serial.println("Choose by typing the name of the following three options");
-      Serial.println("Each crop type has a defined timer:");
-      Serial.println("1. beans");
-      Serial.println("2. peppers");
-      Serial.println("3. tomatoes");
-      
-    }
-    else if (inputString == "maintenance")
-    {
-      currentState = MAINTENANCE;
-      Serial.println("Mode set to MAINTENANCE");
-    }
-    else
-    {
-      Serial.print("Unknown command: ");
-      Serial.println(inputString);
+      Serial.println("Still in MANUAL mode.");
+      Serial.println("Choose: beans, peppers, or tomatoes");
     }
 
     inputString = "";
-    stringComplete = false;
   }
 }
-
-//--------------DISPLAY ACCESS MEMBER ----------------/
 
 //--------------SENSO ACCESS MEMBERS ----------------/
 
 int Sensors::moistureValue(int analogPin)
 {
   int read = constrain(analogRead(analogPin),0,1023);
-  read = map(read,0,1023,0,255);
   return read;
 }

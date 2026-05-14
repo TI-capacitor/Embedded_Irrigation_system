@@ -4,9 +4,6 @@
 #include <Arduino.h>
 enum State { AUTO=1, MANUAL, MAINTENANCE};
 
-extern State currentState;
-extern bool stringComplete;
-extern String inputString;
 
 
 class Valve
@@ -20,16 +17,16 @@ class Valve
 class Mode
 {
   public:
-  	void setAuto();
-  	void setManual();
-  	void setMaintenance();
-		void toggleMode(enum);
+  	void setAuto(State&);
+  	void setManual(State&);
+  	void setMaintenance(State&);
+		void toggleMode(State&);
 };
 
 class Command
 {
 	public:
- 		 void setWithSerial();
+ 		 void setWithSerial(String&,State&,bool&);
 };
 
 class Sensors
