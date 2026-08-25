@@ -5,9 +5,13 @@ On linux:
 ```bash
 git clone git@github.com:TI-capacitor/Embedded_Irrigation_system.git
 ```
-# Overview of Irrigation.h 
-Description of Irrigation.h methods
+Then change into the directory:
+```bash
+cd /Embedded_Irrigation_system.git
+```
+## Overview of Irrigation.h 
 
+# Valve class
 ```c++
 class Valve
 {
@@ -17,7 +21,14 @@ class Valve
   	void valveAuto(int,int,int);
   	int cropThreshold(Crop); //NEW: returns the moisture threshold for a given crop, used by valveAuto() instead of a hardcoded number
 };
+```
+- valveOpen()
+- valveClose(int);
+- valveAuto(int,int,int);
+- cropThreshold(Crop);
 
+#Mode class
+```c++
 class Mode
 {
   public:
@@ -26,17 +37,23 @@ class Mode
   	void setMaintenance(State&);
 	void toggleMode(State&);
 };
+```
+# Command class
+```c++
 
 class Command
 {
 	public:
  		 void setWithSerial(String&,State&,bool&,Crop&,bool&,bool&); 
 };
-
+```
+# Mode class
+```c++
 class Sensors
 {
 	public:
 		int moistureValue(int);
 
 };
+```
 ```
