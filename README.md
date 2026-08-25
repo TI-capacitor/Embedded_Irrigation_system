@@ -19,7 +19,7 @@ class Valve
   	void valveOpen(int);
 	void valveClose(int);
   	void valveAuto(int,int,int);
-  	int cropThreshold(Crop); //NEW: returns the moisture threshold for a given crop, used by valveAuto() instead of a hardcoded number
+  	int cropThreshold(Crop);
 };
 ```
 - valveOpen()
