@@ -1,6 +1,6 @@
-## Embedded Irrigation System
+# Embedded Irrigation System
 
-# Installation
+## Installation
 On linux:
 ```bash
 git clone git@github.com:TI-capacitor/Embedded_Irrigation_system.git
@@ -11,7 +11,7 @@ cd /Embedded_Irrigation_system.git
 ```
 ## Overview of Irrigation.h 
 
-# Valve class
+### Valve class
 ```c++
 class Valve
 {
@@ -27,7 +27,7 @@ class Valve
 - valveAuto(int,int,int): 
 - cropThreshold(Crop): Method to set crop threshold (this is different depending on the type of crop)
 
-# Mode class
+### Mode class
 ```c++
 class Mode
 {
@@ -42,7 +42,7 @@ class Mode
 - void setManual(State&): Manually choose the crops and irrigation time
 - void setMaintenance(State&): turns dissengages power to all components so that the system can be worked on without powering off
 - void toggleMode(State&): 
-# Command class
+### Command class
 ```c++
 
 class Command
@@ -52,7 +52,7 @@ class Command
 };
 ```
 setWithSerial(String&,State&,bool&,Crop&,bool&,bool&): Sets mode through serial interface (ideally through Serial Monitor App)
-# Mode class
+### Mode class
 ```c++
 class Sensors
 {
