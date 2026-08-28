@@ -22,10 +22,10 @@ class Valve
   	int cropThreshold(Crop);
 };
 ```
-- valveOpen()
-- valveClose(int);
-- valveAuto(int,int,int);
-- cropThreshold(Crop);
+- valveOpen(): Activates signal to turn on valve
+- valveClose(int); Turns off valve signal
+- valveAuto(int,int,int): 
+- cropThreshold(Crop): Method to set crop threshold (this is different depending on the type of crop)
 
 #Mode class
 ```c++
@@ -38,6 +38,10 @@ class Mode
 	void toggleMode(State&);
 };
 ```
+- void setAuto(State&): Sets closed loop system with moisture sensor
+- void setManual(State&): Manually choose the crops and irrigation time
+- void setMaintenance(State&): turns dissengages power to all components so that the system can be worked on without powering off
+- void toggleMode(State&): 
 # Command class
 ```c++
 
@@ -47,6 +51,7 @@ class Command
  		 void setWithSerial(String&,State&,bool&,Crop&,bool&,bool&); 
 };
 ```
+setWithSerial(String&,State&,bool&,Crop&,bool&,bool&): Sets mode through serial interface (ideally through Serial Monitor App)
 # Mode class
 ```c++
 class Sensors
@@ -56,4 +61,5 @@ class Sensors
 
 };
 ```
-```
+moistureValue(int): 
+
