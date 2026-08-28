@@ -27,7 +27,7 @@ class Valve
 - valveAuto(int,int,int): 
 - cropThreshold(Crop): Method to set crop threshold (this is different depending on the type of crop)
 
-#Mode class
+# Mode class
 ```c++
 class Mode
 {
